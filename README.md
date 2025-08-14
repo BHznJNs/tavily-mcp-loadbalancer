@@ -6,10 +6,15 @@
 
 **Language / 语言**: [English](./README_EN.md) | [中文](./README.md)
 
-一个支持多API密钥负载均衡的Tavily MCP服务器，提供原生SSE接口，可以自动轮询使用多个API密钥，提供高可用性和更高的请求限制。
+一个支持多API密钥负载均衡的Tavily MCP服务器，同时提供SSE和streamableHTTP接口，可以自动轮询使用多个API密钥，提供高可用性和更高的请求限制。
 
 <details>
 <summary>📋 更新日志</summary>
+
+### v2.1.0 (2025-08-14)
+- 🌐 **streamableHTTP支持**: 新增HTTP POST /mcp端点，支持直接MCP请求-响应模式
+- 🔄 **多协议兼容**: 同时支持SSE和streamableHTTP，满足不同客户端需求
+- 📝 **文档更新**: 添加streamableHTTP接口使用说明和示例
 
 ### v2.0.0 (2025-08-12)
 - 🔄 **架构重构**: 从supergateway依赖改为原生SSE实现
@@ -29,7 +34,7 @@
 
 - 🔄 **智能负载均衡**: 自动轮询多个API密钥，提升并发能力
 - 🛡️ **自动故障转移**: 智能检测并禁用失效密钥
-- 🌐 **原生SSE支持**: 内置SSE服务器，无需外部依赖
+- 🌐 **多协议支持**: 同时支持SSE和streamableHTTP接口
 - 🛠️ **完整工具集**: 支持搜索、提取、爬虫、地图等全套Tavily工具
 - 📊 **实时监控**: 详细的密钥使用日志和性能统计
 - 🔒 **数据安全**: 自动清理和验证响应数据
@@ -66,6 +71,7 @@ npm run build-and-start
 
 **服务启动后访问：**
 - SSE接口: `http://localhost:60002/sse`
+- streamableHTTP接口: `http://localhost:60002/mcp`
 - 健康检查: `http://localhost:60002/health`
 
 <details>
@@ -139,7 +145,47 @@ npm run start-gateway
 
 **SSE接口**: `http://localhost:60002/sse`
 **消息接口**: `http://localhost:60002/message`
+**streamableHTTP接口**: `http://localhost:60002/mcp`
 **健康检查**: `http://localhost:60002/health`
+
+#### streamableHTTP使用示例
+
+```bash
+# 初始化连接
+curl -X POST http://localhost:60002/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2024-11-05",
+      "capabilities": {},
+      "clientInfo": {"name": "test-client", "version": "1.0.0"}
+    }
+  }'
+
+# 获取工具列表
+curl -X POST http://localhost:60002/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}'
+
+# 调用搜索工具
+curl -X POST http://localhost:60002/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "search",
+      "arguments": {
+        "query": "OpenAI GPT-4",
+        "max_results": 3
+      }
+    }
+  }'
+```
 
 ### 工具参数详解
 

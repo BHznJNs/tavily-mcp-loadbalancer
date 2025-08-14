@@ -147,6 +147,51 @@ export class SSEMCPServer {
         uptime: process.uptime()
       });
     });
+
+    // streamableHTTP端点 - 直接MCP请求-响应模式
+    this.app.post('/mcp', async (req: any, res: any) => {
+      try {
+        const mcpRequest: MCPRequest = req.body;
+
+        if (!mcpRequest || !mcpRequest.jsonrpc || !mcpRequest.method) {
+          return res.status(400).json({
+            error: 'Invalid MCP request format. Expected JSON-RPC 2.0 format with method field.'
+          });
+        }
+
+        logWithTimestamp('INFO', `Received streamableHTTP MCP request: ${mcpRequest.method}`);
+
+        const response = await this.handleMCPRequest(mcpRequest);
+
+        // 对于streamableHTTP，总是返回响应（即使是null）
+        if (response) {
+          logWithTimestamp('INFO', `Sending streamableHTTP response, size: ${JSON.stringify(response).length} bytes`);
+          res.json(response);
+        } else {
+          // 对于通知类型的消息，返回成功状态
+          res.json({
+            jsonrpc: '2.0',
+            id: mcpRequest.id,
+            result: { status: 'acknowledged' }
+          });
+        }
+      } catch (error) {
+        logWithTimestamp('ERROR', 'Error handling streamableHTTP MCP request:', error);
+
+        // 返回符合JSON-RPC 2.0规范的错误响应
+        const errorResponse = {
+          jsonrpc: '2.0',
+          id: req.body?.id || null,
+          error: {
+            code: -32603,
+            message: 'Internal error',
+            data: error instanceof Error ? error.message : 'Unknown error'
+          }
+        };
+
+        res.status(500).json(errorResponse);
+      }
+    });
   }
 
   private async handleMCPRequest(request: MCPRequest): Promise<MCPResponse | null> {
@@ -790,6 +835,7 @@ export class SSEMCPServer {
       logWithTimestamp('INFO', `SSE MCP Server listening on port ${this.port}`);
       logWithTimestamp('INFO', `SSE endpoint: http://localhost:${this.port}/sse`);
       logWithTimestamp('INFO', `Message endpoint: http://localhost:${this.port}/message`);
+      logWithTimestamp('INFO', `streamableHTTP endpoint: http://localhost:${this.port}/mcp`);
       logWithTimestamp('INFO', `Health endpoint: http://localhost:${this.port}/health`);
     });
   }

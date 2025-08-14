@@ -1,7 +1,7 @@
 services:
   tavily-mcp-loadbalancer:
     build: .
-    image: tavily-mcp-loadbalancer:latest
+    image: yatotm1994/tavily-mcp-loadbalancer:latest
     ports:
       - "60002:60002"
     environment:
