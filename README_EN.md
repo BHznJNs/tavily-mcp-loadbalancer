@@ -6,10 +6,15 @@
 
 **Language / 语言**: [English](./README_EN.md) | [中文](./README.md)
 
-A Tavily MCP server with multi-API key load balancing support, providing native SSE interface for automatic API key rotation, high availability, and increased request limits.
+A Tavily MCP server with multi-API key load balancing support, providing both SSE and streamableHTTP interfaces for automatic API key rotation, high availability, and increased request limits.
 
 <details>
 <summary>📋 Changelog</summary>
+
+### v2.1.0 (2025-08-14)
+- 🌐 **streamableHTTP Support**: Added HTTP POST /mcp endpoint for direct MCP request-response mode
+- 🔄 **Multi-Protocol Compatibility**: Simultaneous support for SSE and streamableHTTP to meet different client needs
+- 📝 **Documentation Updates**: Added streamableHTTP interface usage instructions and examples
 
 ### v2.0.0 (2025-08-12)
 - 🔄 **Architecture Refactor**: Migrated from supergateway dependency to native SSE implementation
@@ -29,7 +34,7 @@ A Tavily MCP server with multi-API key load balancing support, providing native 
 
 - 🔄 **Smart Load Balancing**: Automatic API key rotation for improved concurrency
 - 🛡️ **Auto Failover**: Intelligent detection and disabling of failed keys
-- 🌐 **Native SSE Support**: Built-in SSE server with no external dependencies
+- 🌐 **Multi-Protocol Support**: Simultaneous support for SSE and streamableHTTP interfaces
 - 🛠️ **Complete Toolset**: Support for search, extract, crawl, map and all Tavily tools
 - 📊 **Real-time Monitoring**: Detailed key usage logs and performance statistics
 - 🔒 **Data Security**: Automatic response cleaning and validation
@@ -66,6 +71,7 @@ npm run build-and-start
 
 **After startup, access:**
 - SSE Interface: `http://localhost:60002/sse`
+- streamableHTTP Interface: `http://localhost:60002/mcp`
 - Health Check: `http://localhost:60002/health`
 
 <details>
@@ -135,9 +141,49 @@ This server provides 5 Tavily tools supporting search, content extraction, web c
 
 ### Interface Description
 
-**SSE Interface**: `http://localhost:60002/sse`  
-**Message Interface**: `http://localhost:60002/message`  
+**SSE Interface**: `http://localhost:60002/sse`
+**Message Interface**: `http://localhost:60002/message`
+**streamableHTTP Interface**: `http://localhost:60002/mcp`
 **Health Check**: `http://localhost:60002/health`
+
+#### streamableHTTP Usage Examples
+
+```bash
+# Initialize connection
+curl -X POST http://localhost:60002/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2024-11-05",
+      "capabilities": {},
+      "clientInfo": {"name": "test-client", "version": "1.0.0"}
+    }
+  }'
+
+# Get tool list
+curl -X POST http://localhost:60002/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}'
+
+# Call search tool
+curl -X POST http://localhost:60002/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "search",
+      "arguments": {
+        "query": "OpenAI GPT-4",
+        "max_results": 3
+      }
+    }
+  }'
+```
 
 ### Tool Parameter Details
 
