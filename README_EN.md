@@ -35,6 +35,7 @@ A Tavily MCP server with multi-API key load balancing support, providing both SS
 - 🔄 **Smart Load Balancing**: Automatic API key rotation for improved concurrency
 - 🛡️ **Auto Failover**: Intelligent detection and disabling of failed keys
 - 🌐 **Multi-Protocol Support**: Simultaneous support for SSE and streamableHTTP interfaces
+- 🧬 **Multi-Architecture Images**: Single image supports both linux/amd64 and linux/arm64
 - 🛠️ **Complete Toolset**: Support for search, extract, crawl, map and all Tavily tools
 - 📊 **Real-time Monitoring**: Detailed key usage logs and performance statistics
 - 🔒 **Data Security**: Automatic response cleaning and validation
@@ -45,7 +46,7 @@ A Tavily MCP server with multi-API key load balancing support, providing both SS
 ### Docker Deployment (Recommended)
 
 ```bash
-# Quick start with Docker Hub image
+# Quick start with Docker Hub image (auto-selects native platform: amd64/arm64)
 docker run -d \
   --name tavily-mcp-lb \
   -p 60002:60002 \
