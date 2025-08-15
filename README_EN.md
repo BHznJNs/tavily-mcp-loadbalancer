@@ -11,6 +11,10 @@ A Tavily MCP server with multi-API key load balancing support, providing both SS
 <details>
 <summary>📋 Changelog</summary>
 
+
+### v2.2.0 (2025-08-15)
+- 🧬 Multi-arch images: released linux/amd64 and linux/arm64; `latest` now points to `2.2.0`
+
 ### v2.1.0 (2025-08-14)
 - 🌐 **streamableHTTP Support**: Added HTTP POST /mcp endpoint for direct MCP request-response mode
 - 🔄 **Multi-Protocol Compatibility**: Simultaneous support for SSE and streamableHTTP to meet different client needs
@@ -195,7 +199,7 @@ curl -X POST http://localhost:60002/mcp \
   "arguments": {
     "query": "OpenAI GPT-4",
     "search_depth": "basic",
-    "topic": "general", 
+    "topic": "general",
     "max_results": 10,
     "start_date": "2024-01-01",
     "end_date": "2024-12-31",

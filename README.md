@@ -11,6 +11,10 @@
 <details>
 <summary>📋 更新日志</summary>
 
+
+### v2.2.0 (2025-08-15)
+- 🧬 多架构镜像：发布 linux/amd64 与 linux/arm64 双平台镜像；`latest` 已指向 `2.2.0`
+
 ### v2.1.0 (2025-08-14)
 - 🌐 **streamableHTTP支持**: 新增HTTP POST /mcp端点，支持直接MCP请求-响应模式
 - 🔄 **多协议兼容**: 同时支持SSE和streamableHTTP，满足不同客户端需求
